@@ -136,7 +136,6 @@ class FailoverDaemon(Daemon):
             except Exception as err:
                 msg = "Cannot get health data: {0}".format(err)
                 self._report(msg, logging.ERROR)
-                raise UtilRplError(msg)
         return ([], [])
 
     def _format_uuid_data(self):
@@ -150,7 +149,6 @@ class FailoverDaemon(Daemon):
             except Exception as err:
                 msg = "Cannot get UUID data: {0}".format(err)
                 self._report(msg, logging.ERROR)
-                raise UtilRplError(msg)
         return ([], [])
 
     def _format_gtid_data(self):
@@ -164,7 +162,6 @@ class FailoverDaemon(Daemon):
             except Exception as err:
                 msg = "Cannot get GTID data: {0}".format(err)
                 self._report(msg, logging.ERROR)
-                raise UtilRplError(msg)
         return ([], [])
 
     def _log_master_status(self):
@@ -625,7 +622,10 @@ class FailoverDaemon(Daemon):
             if self.master and self.master.is_alive():
                 # Log status
                 self._print_warnings()
-                self._log_master_status()
+                try:
+                    self._log_master_status()
+                except UtilRplError:
+                    pass
 
                 self.list_data = []
                 if "health" in self.report_values:
